@@ -120,7 +120,42 @@ leave mark at previous position."
 (defun mark-whole-buffer ()
   "Put point at beginning and mark at end of buffer."
   (interactive)
-  (push-mark (point))
+  (push-mark (point)) ;; same as (push-mask)
   (push-mark (point-max) nil t)
   (goto-char (point-min)))
+
+;; (push-mark &optional LOCATION NOMSG ACTIVATE
+;; LOCATION: set mark at LOCATION,default (point)
+;; NOMSG: display 'Mark Set' if NOMSG is nil
+;; ACTIVATE: activate mark if ACTIVATE non-nil
+
+;; The Definition of append-to-buffer
+;; copy the region(between point and mark) from the current buffer to a specified buffer
+(defun append-to-buffer (buffer start end)
+  "Append to specified buffer the text of the region.
+It is inserted into that buffer before its point.
+
+When calling from a program, give three arguments:
+BUFFER (or buffer name), START and END.
+START and END specify the portion of the current buffer to be copied."
+  (interactive
+   (list (read-buffer "Append to buffer: "
+  		      (other-buffer (current-buffer) t))
+  	 (region-beginning) (region-end)))
+  ;; (interactive "BAppend to buffer: \nr")
+  (let ((oldbuf (current-buffer)))
+    (save-excursion
+      (let* ((append-to (get-buffer-create buffer))
+	      (windows (get-buffer-window-list append-to t t))
+	      point)
+	(set-buffer append-to)
+	(setq point (point))
+	(barf-if-buffer-read-only)
+	(insert-buffer-substring oldbuf start end)
+	(dolist (window windows)
+	  (when (= (window-point window) point)
+	    (set-window-point window (point))))))))
+
+;;(other-buffer &optional BUFFER VISIBLE-OK FRAME)
+;;return most recently selected buffer other than BUFFER.
 
