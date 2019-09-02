@@ -100,3 +100,118 @@ T
      collecting (make-cmp-expr (pop fields) (pop fields))))
 (defmacro where-2 (&rest clauses)
   `#'(lambda (cd) (and ,@(make-cmp-list clauses))))
+
+;; Chapter 5
+
+#|
+Function:
+
+(defun name (parameter*)
+  "Optional documentation string."
+  body-form*)
+
+- Optional parameters
+(defun foo (a b &optional c d) (list a b c d)
+(foo 1 2) -> (1 2 nil nil)
+(foo 1 2 3) -> (1 2 3 nil)
+(foo 1 2 3 4) -> (1 2 3 4)
+
+(defun foo (a &optional (b 10)) (list a b))
+(foo 1) -> (1 10)
+(foo 1 2) -> (1 2)
+
+(defun foo (a &optional (b a)) (list a b))
+(foo 1) -> (1 1)
+(foo 1 2) -> (1 2)
+
+(defun foo (a &optional b (c 3 c-supplied-p)) (list a b c c-supplied-p))
+(foo 1 2) -> (1 2 3 nil)
+(foo 1 2 3) -> (1 2 3 T)
+(foo 1 2 4) -> (1 2 4 T)
+
+- Rest parameters
+
+(defun foo (a &rest values) (list a values))
+(foo 1) -> (1 nil)
+(foo 1 2) -> (1 (2))
+(foo 1 2 3) -> (1 (2 3))
+
+- Keyword Parameters
+(defun foo (&key a b c) (list a b c)
+(foo) -> (nil nil nil)
+(foo :a 1) -> (1 nil nil)
+(foo :b 1) -> (nil 1 nil)
+(foo :c 1) -> (nil nil 1)
+(foo :a 1 :c 3) -> (1 nil 3)
+(foo :a 1 :b 2 :c 3) -> (1 2 3)
+(foo :a 1 :c 3 :b 2) -> (1 2 3)
+
+(defun foo (&key ((:apple a)) ((:box b) 0) ((:charlie c) 0 c-supplied-p))
+  (list a b c c-supplied-p))
+(foo :apple 10 :box 20 :charlie 30) -> (10 20 30 T)
+
+- function as data
+
+(function foo)
+#'foo
+
+(foo 1 2 3) = (funcall #'foo 1 2 3) = (apply #'foo (1 2 3))
+
+- Anonymous functions
+(lambda (parameters) body)
+(funcall #'(lambda (x y) (+ x y)) 1 2) -> 3
+
+|#
+
+;; Chapter 6
+
+#|
+
+- Variables
+(defun foo (x y z) (+ x y z))
+x, y, z are variables
+
+(let (variable*)
+  body-form*)
+
+- Lexcical Variables and Closures
+(defparameter *fn*
+  (let ((count 0))
+    #'(lambda () (setf count (1+ count)))))
+
+(funcall *fn*) -> 1
+(funcall *fn*) -> 2
+(funcall *fn*) -> 3
+
+(let ((count 0))
+  (list
+   #'(lambda () (incf count))
+   #'(lambda () (decf count))
+   #'(lambda () count)))
+
+- Dynamic Variables
+global variables:
+  - defvar: only assigns the initial value if the variable is undefined
+  - defparameter: always assigns the initial value to the variable
+
+(defvar *x* 10)
+(defun foo () (format t "X: ~d~%" *x*))
+(foo)  -> "X: 10"
+(let ((*x* 20)) (foo)) -> "X: 20"
+
+- Constants
+(defconstant name initial-value-form [ documentation-string ])
+
+- Assignment
+(setf place value)
+
+Simple variable:    (setf x 10)
+Array:              (setf (aref a 0) 10)
+Hash Table:         (setf (gethash 'key hash) 10)
+Slot named 'field': (setf (field o) 10)
+
+(rotatef a b) -> swap the values of two variables, return nil
+(shiftf a b 10) -> a=b and b=10, return old value of a
+
+
+|#
