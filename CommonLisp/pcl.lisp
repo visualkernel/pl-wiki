@@ -215,3 +215,44 @@ Slot named 'field': (setf (field o) 10)
 
 
 |#
+
+;; Chapter 7
+#|
+Standard Control Constructs
+
+- if
+(if condition then-form [else-form])
+
+- when
+(defmacro when (condition &rest body)
+  `(if ,condition (progn ,@body)))
+
+- unless
+(defmacro unless (condition &rest body)
+  `(if (not ,condition) (progn ,@body)))
+
+- cond
+(cond
+  (test-1 form*)
+  ...
+  (test-n form*))
+(cond
+  (a (do-x))
+  (b (do-y))
+  (t (do-z)))
+
+- and or not
+(not nil) -> T
+(not (= 1 1)) -> nil
+(and (= 1 2) (= 3 3)) -> nil
+(or (= 1 2) (= 3 3)) -> T
+
+- loop
+(dolist (var list-form)
+  body-form*)
+
+(dotimes (var count-form)
+  body-form*)
+
+
+|#
