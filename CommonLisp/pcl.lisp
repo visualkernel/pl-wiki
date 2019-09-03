@@ -248,11 +248,21 @@ Standard Control Constructs
 (or (= 1 2) (= 3 3)) -> T
 
 - loop
+  * dolist
 (dolist (var list-form)
   body-form*)
 
+  * dotimes
 (dotimes (var count-form)
   body-form*)
+
+  * do
+(do (variable-definitation*)
+    (end-test-form return-form*)
+  statement*)
+
+variable-definitation -> (var init-form step-form)
+
 
 
 |#
