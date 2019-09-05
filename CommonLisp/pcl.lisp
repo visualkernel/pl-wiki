@@ -262,7 +262,74 @@ Standard Control Constructs
   statement*)
 
 variable-definitation -> (var init-form step-form)
-
-
-
 |#
+
+;; Chapter 8
+#|
+- defmacro
+(defmacro name (parameter*)
+  "Optional documentation string."
+  body-form*)
+|#
+;; example: do-primes
+(defun primep (number)
+  (when (> number 1)
+    (loop for fac from 2 to (isqrt number) never (zerop (mod number fac)))))
+
+(defun next-prime (number)
+  (loop for n from number when (primep n) return n))
+
+(do ((p (next-prime 0) (next-prime (1+ p))))
+    ((> p 19))
+  (format t "~d " p))
+
+#|
+(do-primes (p 0 19)
+  (format t "~d " p))
+|#
+
+;; error version 1
+;; ,end will eval on every loop
+(defmacro do-primes ((var start end) &rest body)
+  `(do ((,var (next-prime ,start) (next-prime (1+ ,var))))
+       ((> ,var ,end))
+     ,@body))
+(macroexpand-1 '(do-primes (p 0 19) (format t "~d " p)))
+(macroexpand-1 '(do-primes (p 0 (random 10)) (format t "~d " p)))
+(do-primes (p 0 (random 10))
+  (format t "~d " p)) ;; --> 2 3 5
+
+;; error version 2
+;; if the name of var or start is ending-value, it will cause some error
+(defmacro do-primes ((var start end) &rest body)
+  `(do ((,var (next-prime ,start) (next-prime (1+ ,var)))
+	(ending-value ,end))
+       ((> ,var ending-value))
+     ,@body))
+(do-primes (p 0 (random 10))
+  (format t "~d " p))
+#|
+(do-primes (ending-value 0 10)
+  (format t "~d " ending-value))
+|#
+
+;; version 3
+(defmacro do-primes ((var start end) &rest body)
+  (let ((ending-value-name (gensym)))
+    `(do ((,var (next-prime ,start) (next-prime (1+ ,var)))
+	(,ending-value-name ,end))
+       ((> ,var ,ending-value-name))
+     ,@body)))
+
+(defmacro with-gensyms ((&rest names) &rest body)
+  `(let ,(loop for n in names collect `(,n (gensym)))
+     ,@body))
+(with-gensyms (a b c) (format t "~a ~a ~a" a b c))
+
+;; version 4
+(defmacro do-primes ((var start end) &rest body)
+  (with-gensyms (ending-value-name)
+    `(do ((,var (next-prime ,start) (next-prime (1+ ,var)))
+	  (,ending-value-name ,end))
+	 ((> ,var ,ending-value-name))
+       ,@body)))
