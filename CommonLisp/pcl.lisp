@@ -333,3 +333,27 @@ variable-definitation -> (var init-form step-form)
 	  (,ending-value-name ,end))
 	 ((> ,var ,ending-value-name))
        ,@body)))
+
+;; Chapter 9
+(defun test+= ()
+  (and (= (+ 1 2) 3)
+       (= (+ 2 3) 5)))
+
+(defun test+= ()
+  (format t "~:[fail~;pass~]   ... ~a~%" (= (+ 1 2) 3) '(= (+ 1 2) 3))
+  (format t "~:[fail~;pass~]   ... ~a~%" (= (+ 2 3) 6) '(= (+ 2 3) 6)))
+
+(defun report-result (result form)
+  (format t "~:[FAIL~;pass~]  ... ~a~%" result form))
+(defun test+= ()
+  (report-result (= (+ 1 2) 3) '(= (+ 1 2) 3))
+  (report-result (= (+ 2 3) 6) '(= (+ 2 3) 6)))
+  
+
+(defmacro check (&rest forms)
+  `(progn
+     ,@(loop for f in forms collect `(report-result ,f ',f))))
+
+(defun test+= ()
+  (check (= (+ 1 2) 3)
+	 (= (+ 2 3) 6)))
