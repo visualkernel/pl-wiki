@@ -335,6 +335,8 @@ variable-definitation -> (var init-form step-form)
        ,@body)))
 
 ;; Chapter 9
+
+;; version 1
 (defun test+= ()
   (and (= (+ 1 2) 3)
        (= (+ 2 3) 5)))
